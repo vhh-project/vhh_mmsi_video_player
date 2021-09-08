@@ -1,0 +1,16 @@
+{
+  "name": "vhh-video-player",
+  "description": "Video Player Component for the VHH project",
+  "version": "1.0.0",
+  "dependencies": {
+    "jquery": "~2.2.0",
+    "hls.js": "~0.12.3"
+  },
+  "devDependencies": {
+    "coffee-script": "~1.10.0",
+    "stylus": "0.x"
+  },
+  "scripts": {
+    "build": "./scripts/build.sh"
+  }
+}

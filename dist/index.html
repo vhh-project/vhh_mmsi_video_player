@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>VHH Video Player</title>
+  <link rel="stylesheet" href="/css/vendor/font-awesome.css">
+  <link rel="stylesheet" href="/css/vhh-video-player.css">
+  <link rel="stylesheet" href="/css/vhh-filmstrip.css">
+  <link rel="shortcut icon" href="data:image/x-icon;," type="image/x-icon">
+  <script src="/js/vendor/hls.js"></script>
+  <script src="/js/vendor/jquery.js"></script>
+  <script src="/js/vhh-video-player.js"></script>
+  <script src="/js/vhh-filmstrip.js"></script>
+  <script src="/js/vhh-video-mediator.js"></script>
+  <style>
+    html, body {
+      height: 100%;
+    }
+
+    #demo-video-player-container {
+      width: 800px;
+      height: 60%; 
+    }
+
+    #demo-filmstrip-container {
+      width: 800px;
+      margin-top: 20px;
+    }
+  </style>
+  <script>
+    var videoMediator;
+    var videos = [
+      {
+        name: 'Counter, HLS, 24fps, no Posterframe',
+        fps: 24,
+        isFilm: true,
+        source: {
+          "type": "video/mp4",
+          "src": "/video/counter-24-fps/video.mp4"
+        },
+        filmFormat: "35mm",
+        mask: {
+          top: 0.1,
+          left: 0.1,
+          bottom: 0.3,
+          right: 0.4
+        },
+        shots: [
+          { in: 0, out: 19 },
+          { in: 20, out: 29 },
+          { in: 30, out: 100 }
+        ],
+        hls: [
+          {
+            label: "Auto",
+            resolution: "Auto",
+            src: "/video/counter-24-fps/hls/playlist.m3u8"
+          },
+          {
+            label: "360p",
+            resolution: "360p",
+            src: "/video/counter-24-fps/hls/360p.m3u8"
+          },
+          {
+            label: "480p",
+            resolution: "480p",
+            src: "/video/counter-24-fps/hls/480p.m3u8"
+          },
+          {
+            label: "720p",
+            resolution: "720p",
+            src: "/video/counter-24-fps/hls/720p.m3u8"
+          },
+          {
+            label: "1080p",
+            resolution: "1080p",
+            src: "/video/counter-24-fps/hls/1080p.m3u8"
+          } 
+        ],
+        frames: 195,
+        filmstrip: {
+          path: '/video/counter-24-fps/filmstrip/thumb%s.jpg',
+          digits: 4
+        }
+      },
+      {
+        name: 'Eyeland (with Audio), 25fps',
+        fps: 25,
+        isFilm: false,
+        posterframe: '/video/7_e82cd494e8f6399/7_a6a32dfcb0d056f.jpg',
+        source: {
+          "type": "video/mp4",
+          "src": "/video/7_e82cd494e8f6399/7pre_1e08aace461ce9c.mp4"
+        },
+        mask: {
+          top: 0.1,
+          bottom: 0.1,
+          left: 0.4,
+          right: 0.1
+        },
+        hls: [
+          {
+            label: "Auto",
+            resolution: "Auto",
+            src: "/video/7_e82cd494e8f6399/7pre_1e08aace461ce9c.m3u8"
+          },
+          {
+            label: "Low",
+            resolution: "Low",
+            src: "/video/7_e82cd494e8f6399/7pre_lo_4a5b8b3201f5782.m3u8"
+          },
+          {
+            label: "SD",
+            resolution: "SD",
+            src: "/video/7_e82cd494e8f6399/7pre_sd_1ac311e0332714e.m3u8"
+          },
+          {
+            label: "HQ",
+            resolution: "HQ",
+            src: "/video/7_e82cd494e8f6399/7pre_hi_b5397a007f08603.m3u8"
+          } 
+        ]
+      }
+    ]
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      var select = document.getElementById('select-video')
+      var options = [];
+
+      videoMediator = new VhhVideoMediator;
+
+      for (var i = 0; i < videos.length; i++) {
+        var video = videos[i];
+        options.push('<option value="' + i + '">' + video.name + '</option>')
+      }
+
+      select.innerHTML = options.join("\n");
+
+      createVideoPlayer(0);
+    });
+
+    function changeSelect(e) {
+      createVideoPlayer(e.currentTarget.value);
+    }
+
+    function createVideoPlayer(index) {
+      if (window.videoPlayer) {
+        window.videoPlayer.remove();
+      }
+
+      if (window.filmstrip) {
+        window.filmstrip.remove();
+        delete window.filmstrip;
+      }
+
+      var video = videos[index];
+
+      window.videoPlayer = new VhhVideoPlayer({
+        container: document.getElementById('demo-video-player-container'),
+        mediator: videoMediator,
+        adjustHeightToContainer: true,
+        adjustHeight: false,
+        height: 400,
+        canShowMask: true,
+        showMask: true,
+        canShowZoom: true,
+        showZoom: true,
+        video: video
+      });
+
+      if (video.filmstrip) {
+        window.filmstrip = new VhhFilmstrip({
+          container: document.getElementById('demo-filmstrip-container'),
+          mediator: videoMediator,
+          firstFrameNumber: 1,
+          lastFrameNumber: video.frames,
+          path: video.filmstrip.path,
+          pathDigits: video.filmstrip.digits
+        })
+      }
+    }
+  </script>
+</head>
+<body>
+  <div>
+    <select id="select-video" onchange="changeSelect(event);"></select>
+    <p>&nbsp;</p>
+  </div>
+  <div id="demo-video-player-container"></div>
+  <div id="demo-filmstrip-container"></div>
+</body>
